@@ -18,6 +18,14 @@ MAX_RESUME_CHARS = 12000
 for _d in (DATA_DIR, UPLOAD_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
+
+
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "")
 JOB_COUNTRY = "in"
 MAX_QUERIES = 2
+
+EMBED_MODEL = "all-MiniLM-L6-v2"
+TOP_N_FOR_LLM = 15      # embedding ke baad kitni jobs LLM se score karani hain
+W_LLM = 0.5             # final score me LLM ka hissa
+W_SEMANTIC = 0.3        # embedding similarity ka hissa
+W_PREF = 0.2            # must-have skills ka hissa

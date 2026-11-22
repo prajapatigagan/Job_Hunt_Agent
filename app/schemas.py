@@ -57,3 +57,22 @@ class Job(BaseModel):
     posted_at: Optional[str] = None
     salary_min: Optional[float] = None
     salary_max: Optional[float] = None
+
+
+class LLMScore(BaseModel):
+    score: int
+    matched_skills: List[str] = Field(default_factory=list)
+    missing_skills: List[str] = Field(default_factory=list)
+    reason: str = ""
+
+
+class MatchResult(BaseModel):
+    job_id: str
+    semantic_score: float
+    llm_score: Optional[float] = None
+    preference_score: float = 0.0
+    final_score: float
+    matched_skills: List[str] = Field(default_factory=list)
+    missing_skills: List[str] = Field(default_factory=list)
+    reason: str = ""
+    verdict: str = "skip"
