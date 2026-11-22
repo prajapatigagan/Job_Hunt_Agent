@@ -1,9 +1,13 @@
+import html
 import uuid
 
 import streamlit as st
 
 from app import db, job_db, tailored_db
 from app.agent_graph import build_graph, start_run, resume_run, get_run_state
+from ui.styles import chip, chips, flash, section, stepper
+
+STEPS = ["Search", "Match", "Select", "Tailor", "Approval"]
 
 
 @st.cache_resource
@@ -17,7 +21,7 @@ def send_decision(graph, run_id, decision):
         try:
             resume_run(graph, run_id, decision)
         except Exception as e:
-            st.error(f"Agent me error: {e}")
+            flash(f"Agent me error: {e}", "error")
     st.rerun()
 
 
@@ -31,38 +35,59 @@ def show_approval_card(graph, run_id, values):
         st.error("Draft ya job nahi mili. Start agent dobara dabao.")
         return
 
-    st.subheader(f"Approval chahiye: {job.title} - {job.company}")
-    st.caption(f"Iske baad {len(values.get('queue', []))} jobs aur baaki hain.")
-    st.markdown(f"[Job link]({job.url})")
+    with st.container(border=True):
+        st.markdown(
+            f'<div class="job-title">{html.escape(job.title)}</div>'
+            f'<div class="job-sub">{html.escape(job.company)} · {html.escape(job.location or "-")}</div>',
+            unsafe_allow_html=True,
+        )
+        if doc.passed:
+            badge = chip(f"Critic pass · attempt {doc.attempts}", "green")
+        else:
+            badge = chip("Critic ne galtiyan pakdi", "amber")
+        remaining = len(values.get("queue", []))
+        st.markdown(badge + chip(f"{remaining} jobs aur baaki", "gray"), unsafe_allow_html=True)
 
-    if doc.passed:
-        st.success(f"Critic pass hua (attempt {doc.attempts}).")
-    else:
-        st.warning("Critic ne ye galtiyan pakdi. Dhyan se padho:")
+    if not doc.passed:
+        st.warning("Dhyan se padho, critic ne ye pakda:")
         for issue in doc.issues:
             st.write("- " + issue)
 
-    st.write("**Summary:** " + doc.summary)
-    st.write("**Skills:** " + ", ".join(doc.skills_to_highlight))
-    st.write("**Resume points:**")
-    for b in doc.bullets:
-        st.write(f"- {b.text}")
+    left, right = st.columns(2)
 
-    letter = st.text_area(
-        "Cover letter (edit kar sakte ho)", value=doc.cover_letter, height=260, key=f"agent_cl_{job_id}"
-    )
-    reason = st.text_input("Reject karne ka reason (optional)", key=f"agent_reason_{job_id}")
+    with left:
+        section("Summary")
+        st.write(doc.summary)
+        section("Skills")
+        st.markdown(chips(doc.skills_to_highlight, "blue"), unsafe_allow_html=True)
+        section("Resume points")
+        for b in doc.bullets:
+            st.write("- " + b.text)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Approve", key=f"approve_{job_id}"):
-            decision = {"action": "approve"}
-            if letter != doc.cover_letter:
-                decision["cover_letter"] = letter
-            send_decision(graph, run_id, decision)
-    with col2:
-        if st.button("Reject", key=f"reject_{job_id}"):
-            send_decision(graph, run_id, {"action": "reject", "reason": reason})
+    with right:
+        section("Cover letter (edit kar sakte ho)")
+        letter = st.text_area(
+            "Cover letter",
+            value=doc.cover_letter,
+            height=300,
+            key=f"agent_cl_{job_id}",
+            label_visibility="collapsed",
+        )
+        reason = st.text_input("Reject reason (optional)", key=f"agent_reason_{job_id}")
+
+        b1, b2 = st.columns(2)
+        with b1:
+            if st.button("Approve", key=f"approve_{job_id}", type="primary"):
+                decision = {"action": "approve"}
+                if letter != doc.cover_letter:
+                    decision["cover_letter"] = letter
+                send_decision(graph, run_id, decision)
+        with b2:
+            if st.button("Reject", key=f"reject_{job_id}"):
+                send_decision(graph, run_id, {"action": "reject", "reason": reason})
+
+        if job.url:
+            st.link_button("Job link kholo", job.url)
 
 
 def show_agent_tab():
@@ -72,20 +97,26 @@ def show_agent_tab():
         st.warning("Pehle profile aur preferences save karo.")
         return
 
-    do_search = st.checkbox("Naye jobs bhi dhundo (JSearch ki request lagegi)", value=False)
+    top = st.columns([3, 1])
+    with top[0]:
+        do_search = st.checkbox("Naye jobs bhi dhundo (JSearch ki request lagegi)", value=False)
+    with top[1]:
+        start_clicked = st.button("Start agent", type="primary")
 
-    if st.button("Start agent"):
+    if start_clicked:
         run_id = str(uuid.uuid4())
         st.session_state["run_id"] = run_id
         with st.spinner("Agent chal raha hai (match, tailor, critic)... thoda time lagega"):
             try:
                 start_run(graph, run_id, do_search)
             except Exception as e:
-                st.error(f"Agent me error: {e}")
+                flash(f"Agent me error: {e}", "error")
+        st.rerun()
 
     run_id = st.session_state.get("run_id")
     if not run_id:
-        st.info("Start agent dabao.")
+        stepper(STEPS, -1)
+        st.info("Start agent dabao. Agent jobs match karega, draft likhega aur tere approval par ruk jayega.")
         return
 
     next_nodes, values = get_run_state(graph, run_id)
@@ -93,11 +124,20 @@ def show_agent_tab():
         st.warning("Is run ka data nahi mila. Start agent dobara dabao.")
         return
 
-    st.subheader("Agent log")
-    for line in values.get("log", []):
-        st.write("- " + line)
+    paused = next_nodes == ("approval",)
 
-    if next_nodes == ("approval",):
+    if paused:
+        stepper(STEPS, 4)
+    elif next_nodes:
+        stepper(STEPS, 3)
+    else:
+        stepper(STEPS, len(STEPS))
+
+    with st.expander("Agent log", expanded=not paused):
+        for line in values.get("log", []):
+            st.write("- " + line)
+
+    if paused:
         show_approval_card(graph, run_id, values)
     elif next_nodes:
         st.warning("Run beech me ruk gaya (shayad koi error aaya). Start agent dobara dabao.")

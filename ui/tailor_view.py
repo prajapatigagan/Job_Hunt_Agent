@@ -2,6 +2,7 @@ import streamlit as st
 
 from app import tailored_db
 from app.tailor import make_tailored_doc
+from ui.styles import chip, chips
 
 
 def doc_to_text(job, doc):
@@ -20,6 +21,39 @@ def doc_to_text(job, doc):
     return "\n".join(lines)
 
 
+def show_doc(doc, job):
+    if doc.passed:
+        st.markdown(chip(f"Critic pass · attempt {doc.attempts}", "green"), unsafe_allow_html=True)
+    else:
+        st.warning(f"{doc.attempts} try ke baad bhi critic ne ye galtiyan pakdi. Manual review karo:")
+        for issue in doc.issues:
+            st.write("- " + issue)
+
+    tab_points, tab_letter = st.tabs(["Resume points", "Cover letter"])
+
+    with tab_points:
+        st.write(doc.summary)
+        st.markdown(chips(doc.skills_to_highlight, "blue"), unsafe_allow_html=True)
+        for b in doc.bullets:
+            st.write("- " + b.text)
+            st.markdown(chip("from: " + b.source, "gray"), unsafe_allow_html=True)
+
+    with tab_letter:
+        st.text_area(
+            "Cover letter",
+            value=doc.cover_letter,
+            height=260,
+            key=f"cl_{job.id}",
+            label_visibility="collapsed",
+        )
+        st.download_button(
+            "Download (.txt)",
+            data=doc_to_text(job, doc),
+            file_name="tailored_application.txt",
+            key=f"dl_{job.id}",
+        )
+
+
 def show_tailor_section(profile, job, match):
     st.divider()
 
@@ -32,30 +66,5 @@ def show_tailor_section(profile, job, match):
                 st.error(f"Tailoring fail hui: {e}")
 
     doc = tailored_db.load_tailored(job.id)
-    if doc is None:
-        return
-
-    if doc.passed:
-        st.success(f"Critic pass hua (attempt {doc.attempts}).")
-    else:
-        st.warning(f"{doc.attempts} try ke baad bhi critic ne ye galtiyan pakdi. Manual review karo:")
-        for issue in doc.issues:
-            st.write("- " + issue)
-
-    st.write("**Summary:** " + doc.summary)
-    st.write("**Skills:** " + ", ".join(doc.skills_to_highlight))
-
-    st.write("**Resume points:**")
-    for b in doc.bullets:
-        st.write(f"- {b.text}")
-        st.caption(f"source: {b.source}")
-
-    st.write("**Cover letter:**")
-    st.text_area("Cover letter", value=doc.cover_letter, height=260, key=f"cl_{job.id}")
-
-    st.download_button(
-        "Download (.txt)",
-        data=doc_to_text(job, doc),
-        file_name="tailored_application.txt",
-        key=f"dl_{job.id}",
-    )
+    if doc is not None:
+        show_doc(doc, job)
