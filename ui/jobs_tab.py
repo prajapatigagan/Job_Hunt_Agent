@@ -4,6 +4,7 @@ from app import db, job_db, match_db
 from app.job_finder import find_jobs, JobSearchError
 from app.llm import LLMError
 from app.matcher import match_jobs
+from ui.tailor_view import show_tailor_section
 
 
 def show_jobs_tab():
@@ -53,6 +54,10 @@ def show_jobs_tab():
     jobs_by_id = {job.id: job for job in saved}
 
     st.subheader(f"Ranked matches ({len(matches)})")
+
+    if profile is None:
+        st.info("Tailor button dekhne ke liye pehle Resume / Profile tab me profile save karo.")
+
     for m in matches:
         job = jobs_by_id.get(m.job_id)
         if job is None:
@@ -69,6 +74,9 @@ def show_jobs_tab():
             st.write("Missing skills: " + (", ".join(m.missing_skills) or "-"))
             st.write("Reason: " + m.reason)
             st.markdown(f"[Apply link]({job.url})")
+
+            if profile is not None:
+                show_tailor_section(profile, job, m)
 
     # ---------- saari saved jobs ----------
     st.subheader(f"Saari saved jobs ({len(saved)})")

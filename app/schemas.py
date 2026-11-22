@@ -76,3 +76,31 @@ class MatchResult(BaseModel):
     missing_skills: List[str] = Field(default_factory=list)
     reason: str = ""
     verdict: str = "skip"
+
+
+class TailoredBullet(BaseModel):
+    text: str
+    source: str = ""        # profile ka kaun sa project/company se aaya
+
+
+class TailorOutput(BaseModel):
+    summary: str = ""
+    skills_to_highlight: List[str] = Field(default_factory=list)
+    bullets: List[TailoredBullet] = Field(default_factory=list)
+    cover_letter: str = ""
+
+
+class CriticReport(BaseModel):
+    passed: bool
+    violations: List[str] = Field(default_factory=list)
+
+
+class TailoredDoc(BaseModel):
+    job_id: str
+    summary: str = ""
+    skills_to_highlight: List[str] = Field(default_factory=list)
+    bullets: List[TailoredBullet] = Field(default_factory=list)
+    cover_letter: str = ""
+    attempts: int = 1
+    passed: bool = False
+    issues: List[str] = Field(default_factory=list)

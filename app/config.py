@@ -29,3 +29,5 @@ TOP_N_FOR_LLM = 15      # embedding ke baad kitni jobs LLM se score karani hain
 W_LLM = 0.5             # final score me LLM ka hissa
 W_SEMANTIC = 0.3        # embedding similarity ka hissa
 W_PREF = 0.2            # must-have skills ka hissa
+
+MAX_TAILOR_ATTEMPTS = 3
