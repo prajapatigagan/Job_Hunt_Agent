@@ -104,3 +104,10 @@ class TailoredDoc(BaseModel):
     attempts: int = 1
     passed: bool = False
     issues: List[str] = Field(default_factory=list)
+
+class Application(BaseModel):
+    job_id: str
+    status: str
+    notes: str = ""
+    reason: str = ""
+    updated_at: str = ""

@@ -31,3 +31,6 @@ W_SEMANTIC = 0.3        # embedding similarity ka hissa
 W_PREF = 0.2            # must-have skills ka hissa
 
 MAX_TAILOR_ATTEMPTS = 3
+
+TOP_K_JOBS = 3   # ek run me kitni jobs approval ke liye aayengi
+STATUSES = ["shortlisted", "drafted", "approved", "applied", "interview", "offer", "rejected", "withdrawn"]

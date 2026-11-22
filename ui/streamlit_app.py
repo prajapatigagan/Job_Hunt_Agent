@@ -13,6 +13,8 @@ from app.pdf_reader import PDFError
 from app.profile_parser import parse_resume_pdf
 from app.schemas import Preferences, UserProfile
 from ui.jobs_tab import show_jobs_tab
+from ui.agent_tab import show_agent_tab
+from ui.tracker_tab import show_tracker_tab
 
 st.set_page_config(page_title="Job Hunt Agent", layout="wide")
 db.init_db()
@@ -23,7 +25,9 @@ def csv_to_list(s):
 
 
 st.title("Job Hunt Agent")
-tab_profile, tab_prefs, tab_jobs = st.tabs(["Resume / Profile", "Preferences", "Jobs"])
+tab_profile, tab_prefs, tab_jobs, tab_agent, tab_tracker = st.tabs(
+    ["Resume / Profile", "Preferences", "Jobs", "Agent", "Tracker"]
+)
 
 with tab_profile:
     uploaded = st.file_uploader("Resume PDF upload karo", type=["pdf"])
@@ -82,6 +86,12 @@ with tab_prefs:
                 )
             )
             st.success("Preferences save ho gaye.")
-            
+
 with tab_jobs:
     show_jobs_tab()
+
+with tab_agent:
+    show_agent_tab()
+
+with tab_tracker:
+    show_tracker_tab()
