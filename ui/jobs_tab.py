@@ -2,10 +2,10 @@ import html
 
 import streamlit as st
 
-from app import db, job_db, match_db
-from app.job_finder import find_jobs, JobSearchError
+from app.storage import db, job_db, match_db
+from app.agent.tools.job_finder import find_jobs, JobSearchError
 from app.llm import LLMError
-from app.matcher import match_jobs
+from app.rag.matcher import match_jobs
 from ui.styles import VERDICT_KIND, chip, chips, flash, score_bar, section
 from ui.tailor_view import show_tailor_section
 

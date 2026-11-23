@@ -2,7 +2,7 @@ import html
 
 import streamlit as st
 
-from app import application_db, job_db
+from app.storage import application_db, job_db
 from app.config import STATUSES
 from ui.styles import STATUS_KIND, chip, flash
 

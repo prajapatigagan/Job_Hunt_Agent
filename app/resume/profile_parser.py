@@ -2,7 +2,7 @@
 
 from app.config import MAX_RESUME_CHARS
 from app.llm import generate_structured
-from app.pdf_reader import read_pdf_text
+from app.resume.pdf_reader import read_pdf_text
 from app.schemas import UserProfile
 
 SYSTEM_PROMPT = """You are a precise resume parser.
@@ -29,6 +29,6 @@ def parse_resume_pdf(path: str) -> UserProfile:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python -m app.profile_parser <resume.pdf>")
+        print("Usage: python -m app.resume.profile_parser <resume.pdf>")
         sys.exit(1)
     print(parse_resume_pdf(sys.argv[1]).model_dump_json(indent=2))

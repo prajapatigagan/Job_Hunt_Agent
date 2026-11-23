@@ -3,8 +3,8 @@ import uuid
 
 import streamlit as st
 
-from app import db, job_db, tailored_db
-from app.agent_graph import build_graph, start_run, resume_run, get_run_state
+from app.storage import db, job_db, tailored_db
+from app.agent.graph import build_graph, start_run, resume_run, get_run_state
 from ui.styles import chip, chips, flash, section, stepper
 
 STEPS = ["Search", "Match", "Select", "Tailor", "Approval"]

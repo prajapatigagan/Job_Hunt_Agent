@@ -5,11 +5,11 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.types import Command, interrupt
 
-from app import application_db, db, job_db, match_db, tailored_db
+from app.storage import application_db, db, job_db, match_db, tailored_db
 from app.config import TOP_K_JOBS
-from app.job_finder import find_jobs
-from app.matcher import match_jobs
-from app.tailor import make_tailored_doc
+from app.agent.tools.job_finder import find_jobs
+from app.rag.matcher import match_jobs
+from app.agent.tailor import make_tailored_doc
 
 
 # graph ka shared data. Sirf chhoti, simple cheezein rakhi hain.
@@ -166,7 +166,7 @@ def get_run_state(graph, run_id):
 
 
 if __name__ == "__main__":
-    # bina UI ke terminal me test:  python -m app.agent_graph
+    # bina UI ke terminal me test:  python -m app.agent.graph
     import uuid
 
     db.init_db()

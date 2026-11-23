@@ -4,8 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import streamlit as st
-
-from app import application_db, db, job_db, match_db
+from app.storage import application_db, db, job_db, match_db
 from ui.agent_tab import show_agent_tab
 from ui.jobs_tab import show_jobs_tab
 from ui.setup_tabs import show_prefs_tab, show_profile_tab

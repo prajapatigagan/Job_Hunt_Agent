@@ -1,7 +1,7 @@
 import streamlit as st
 
-from app import tailored_db
-from app.tailor import make_tailored_doc
+from app.storage import tailored_db
+from app.agent.tailor import make_tailored_doc
 from ui.styles import chip, chips
 
 

@@ -1,7 +1,7 @@
 import json
 
 from app.config import MAX_TAILOR_ATTEMPTS
-from app.critic import check_all
+from app.agent.critic import check_all
 from app.llm import generate_structured
 from app.schemas import TailorOutput, TailoredDoc
 
@@ -81,8 +81,8 @@ def make_tailored_doc(profile, job, match):
 
 
 if __name__ == "__main__":
-    # bina UI ke test:  python -m app.tailor
-    from app import db, job_db, match_db
+    # bina UI ke test:  python -m app.agent.tailor
+    from app.storage import db, job_db, match_db
 
     db.init_db()
     profile = db.load_profile()

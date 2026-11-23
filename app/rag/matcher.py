@@ -188,8 +188,8 @@ def match_jobs(profile, prefs, jobs, progress=None):
 
 
 if __name__ == "__main__":
-    # bina UI ke test:  python -m app.matcher
-    from app import db, job_db
+    # bina UI ke test:  python -m app.rag.matcher
+    from app.storage import db, job_db
 
     db.init_db()
     profile = db.load_profile()

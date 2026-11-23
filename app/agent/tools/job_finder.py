@@ -149,8 +149,8 @@ def find_jobs(prefs):
 
 
 if __name__ == "__main__":
-    # bina UI ke test:  python -m app.job_finder
-    from app import db
+    # bina UI ke test:  python -m app.agent.tools.job_finder
+    from app.storage import db
 
     db.init_db()
     prefs = db.load_preferences()

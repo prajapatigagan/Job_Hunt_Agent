@@ -1,11 +1,11 @@
 import streamlit as st
 from pydantic import ValidationError
 
-from app import db
+from app.storage import db
 from app.config import UPLOAD_DIR
 from app.llm import LLMError
-from app.pdf_reader import PDFError
-from app.profile_parser import parse_resume_pdf
+from app.resume.pdf_reader import PDFError
+from app.resume.profile_parser import parse_resume_pdf
 from app.schemas import Preferences, UserProfile
 from ui.styles import chips, flash, section
 
