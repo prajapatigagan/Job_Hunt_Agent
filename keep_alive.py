@@ -2,9 +2,9 @@ import time
 import requests
 import logging
 
-APP_URL = "https://your-app-name.streamlit.app"
+APP_URL = "https://jobhuntagent-gagan.streamlit.app/"
 
-INTERVAL = 300  # 5 minutes
+INTERVAL = 10  # 10 seconds
 
 logging.basicConfig(
     level=logging.INFO,
