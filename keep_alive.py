@@ -29,5 +29,5 @@ def keep_alive():
         time.sleep(INTERVAL)
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     keep_alive()
