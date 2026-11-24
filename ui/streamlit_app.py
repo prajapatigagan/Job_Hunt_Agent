@@ -4,6 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import streamlit as st
+
 from app.storage import application_db, db, job_db, match_db
 from ui.agent_tab import show_agent_tab
 from ui.jobs_tab import show_jobs_tab
@@ -19,7 +20,7 @@ load_css()
 def show_sidebar(profile, prefs, jobs, matches, apps):
     with st.sidebar:
         st.markdown("### Job Hunt Agent")
-        st.caption("Resume se apply tak, ek jagah.")
+        st.caption("From resume to application, in one place.")
         st.divider()
 
         steps = [
@@ -57,7 +58,7 @@ apps = application_db.load_applications()
 
 show_sidebar(profile, prefs, jobs, matches, apps)
 
-hero("Job Hunt Agent", "Jobs dhundo, match karo, resume tailor karo aur apply track karo.")
+hero("Job Hunt Agent", "Find jobs, match them, tailor your resume and track your applications.")
 show_metrics(jobs, matches, apps)
 show_flash()
 

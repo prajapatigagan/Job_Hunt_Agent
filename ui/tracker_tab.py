@@ -10,7 +10,7 @@ from ui.styles import STATUS_KIND, chip, flash
 def show_tracker_tab():
     applications = application_db.load_applications()
     if not applications:
-        st.info("Abhi koi application nahi hai. Agent chalao.")
+        st.info("No applications yet. Run the agent.")
         return
 
     jobs = {job.id: job for job in job_db.load_jobs()}
@@ -56,7 +56,7 @@ def show_tracker_tab():
 
                 if st.button("Update", key=f"update_{row.job_id}", type="primary"):
                     application_db.set_status(row.job_id, new_status, notes=notes)
-                    flash("Status update ho gaya.")
+                    flash("Status updated.")
                     st.rerun()
 
                 history = application_db.get_history(row.job_id)

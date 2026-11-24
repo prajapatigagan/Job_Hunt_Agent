@@ -51,7 +51,7 @@ def show_jobs_tab():
     profile = db.load_profile()
 
     if prefs is None:
-        st.warning("Pehle Preferences tab me role aur city save karo.")
+        st.warning("Save your roles and cities in the Preferences tab first.")
         return
 
     top = st.columns([3, 1, 1])
@@ -68,13 +68,13 @@ def show_jobs_tab():
 
     saved = job_db.load_jobs()
 
-    # ---------- jobs dhundhna ----------
+    # ---------- find jobs ----------
     if find_clicked:
-        with st.spinner("Jobs dhundh raha hoon..."):
+        with st.spinner("Searching for jobs..."):
             try:
                 found = find_jobs(prefs)
                 new_count = job_db.save_jobs(found)
-                flash(f"{len(found)} jobs mili, {new_count} naye save hue.")
+                flash(f"{len(found)} jobs found, {new_count} new saved.")
             except JobSearchError as e:
                 flash(str(e), "error")
         st.rerun()
@@ -82,19 +82,19 @@ def show_jobs_tab():
     # ---------- matching ----------
     if match_clicked:
         if profile is None:
-            flash("Pehle Resume / Profile tab me profile save karo.", "error")
+            flash("Save your profile in the Resume / Profile tab first.", "error")
         elif not saved:
-            flash("Pehle Find jobs chalao.", "error")
+            flash("Run Find jobs first.", "error")
         else:
-            progress = st.progress(0.0, text="Match kar raha hoon...")
+            progress = st.progress(0.0, text="Matching...")
 
             def update(done, total):
-                progress.progress(done / total, text=f"{done}/{total} jobs score hue")
+                progress.progress(done / total, text=f"{done}/{total} jobs scored")
 
             try:
                 results = match_jobs(profile, prefs, saved, update)
                 match_db.save_matches(results)
-                flash(f"{len(results)} jobs score ho gayi.")
+                flash(f"{len(results)} jobs scored.")
             except LLMError as e:
                 flash(str(e), "error")
         st.rerun()
@@ -105,9 +105,9 @@ def show_jobs_tab():
 
     section(f"Ranked matches ({len(matches)})")
     if not matches:
-        st.info("Abhi koi match nahi hai. Pehle Find jobs, phir Match jobs dabao.")
+        st.info("No matches yet. Press Find jobs first, then Match jobs.")
     elif profile is None:
-        st.info("Tailor button dekhne ke liye pehle profile save karo.")
+        st.info("Save your profile first to see the Tailor button.")
 
     for m in matches:
         job = jobs_by_id.get(m.job_id)
@@ -115,8 +115,8 @@ def show_jobs_tab():
             continue
         show_match_card(m, job, profile)
 
-    # ---------- saari saved jobs ----------
-    with st.expander(f"Saari saved jobs ({len(saved)})"):
+    # ---------- all saved jobs ----------
+    with st.expander(f"All saved jobs ({len(saved)})"):
         for job in saved:
             st.markdown(f"**{job.title}** · {job.company} · {job.location}")
             if job.salary_min:
@@ -126,8 +126,8 @@ def show_jobs_tab():
                 st.markdown(f"[Apply link]({job.url})")
             st.divider()
 
-    if saved and st.button("Saari jobs hatao"):
+    if saved and st.button("Delete all jobs"):
         job_db.clear_jobs()
         match_db.clear_matches()
-        flash("Saari jobs hata di.", "info")
+        flash("All jobs deleted.", "info")
         st.rerun()

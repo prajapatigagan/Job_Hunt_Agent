@@ -59,29 +59,29 @@ def show_profile_tab():
         if uploaded and st.button("Parse resume", type="primary"):
             pdf_path = UPLOAD_DIR / "resume.pdf"
             pdf_path.write_bytes(uploaded.getvalue())
-            with st.spinner("Resume padh raha hoon..."):
+            with st.spinner("Reading your resume..."):
                 try:
                     st.session_state["draft"] = parse_resume_pdf(str(pdf_path))
-                    st.success("Parse ho gaya. Check karke save karo.")
+                    st.success("Parsed. Review it and save.")
                 except (PDFError, LLMError) as e:
                     st.error(str(e))
 
-        st.caption("Text wala PDF use karo. Scanned image PDF nahi chalega.")
+        st.caption("Use a text-based PDF. Scanned image PDFs will not work.")
 
     current = st.session_state.get("draft") or db.load_profile()
     is_draft = "draft" in st.session_state
 
     with right:
         if current is None:
-            st.info("Abhi koi profile nahi hai. Left side se resume upload karo.")
+            st.info("No profile yet. Upload a resume on the left.")
             return
 
         if is_draft:
-            st.warning("Ye abhi save nahi hua. Neeche JSON me check karke Save profile dabao.")
+            st.warning("This is not saved yet. Check the JSON below and press Save profile.")
 
         show_profile_card(current)
 
-        with st.expander("Profile JSON edit karo", expanded=is_draft):
+        with st.expander("Edit profile JSON", expanded=is_draft):
             edited = st.text_area(
                 "Profile JSON",
                 value=current.model_dump_json(indent=2),
@@ -95,9 +95,9 @@ def show_profile_tab():
                     st.session_state.pop("draft", None)
                     saved = True
                 except ValidationError as e:
-                    st.error(f"JSON galat hai:\n{e}")
+                    st.error(f"Invalid JSON:\n{e}")
             if saved:
-                flash("Profile save ho gaya.")
+                flash("Profile saved.")
                 st.rerun()
 
 
@@ -121,7 +121,7 @@ def show_prefs_tab():
                 "Min salary (LPA)", min_value=0.0, value=float(p.min_salary_lpa or 0.0), step=0.5
             )
             black = st.text_input("Blacklist companies (comma separated)", ", ".join(p.blacklist_companies))
-            remote = st.checkbox("Remote chalega", value=p.remote_ok)
+            remote = st.checkbox("Open to remote", value=p.remote_ok)
 
         submitted = st.form_submit_button("Save preferences", type="primary")
 
@@ -137,5 +137,5 @@ def show_prefs_tab():
                 blacklist_companies=csv_to_list(black),
             )
         )
-        flash("Preferences save ho gaye.")
+        flash("Preferences saved.")
         st.rerun()

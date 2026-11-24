@@ -23,9 +23,9 @@ def doc_to_text(job, doc):
 
 def show_doc(doc, job):
     if doc.passed:
-        st.markdown(chip(f"Critic pass · attempt {doc.attempts}", "green"), unsafe_allow_html=True)
+        st.markdown(chip(f"Critic passed · attempt {doc.attempts}", "green"), unsafe_allow_html=True)
     else:
-        st.warning(f"{doc.attempts} try ke baad bhi critic ne ye galtiyan pakdi. Manual review karo:")
+        st.warning(f"The critic still flagged these problems after {doc.attempts} attempts. Review manually:")
         for issue in doc.issues:
             st.write("- " + issue)
 
@@ -58,12 +58,12 @@ def show_tailor_section(profile, job, match):
     st.divider()
 
     if st.button("Tailor resume + cover letter", key=f"tailor_{job.id}"):
-        with st.spinner("Likh raha hoon aur check kar raha hoon..."):
+        with st.spinner("Writing and checking..."):
             try:
                 doc = make_tailored_doc(profile, job, match)
                 tailored_db.save_tailored(doc)
             except Exception as e:
-                st.error(f"Tailoring fail hui: {e}")
+                st.error(f"Tailoring failed: {e}")
 
     doc = tailored_db.load_tailored(job.id)
     if doc is not None:
